@@ -1,0 +1,11 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.huawei.mail.po.EmailConfig",
+      "name": "spring.mail",
+      "type": "com.huawei.mail.po.EmailConfig"
+    }
+  ],
+  "properties": []
+}
