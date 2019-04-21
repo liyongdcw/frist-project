@@ -1,4 +1,4 @@
-package com.huawei.mail.control;
+package com.huawei.mail.utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -24,20 +22,39 @@ import com.alibaba.fastjson.JSONObject;
 import com.huawei.mail.po.ReceiverPo;
 
 /**
- * 富文本邮件
- * @author liyong
- *
+ * 邮箱工具类
  */
-@RestController
-@RequestMapping("/richMail")
-public class RichMailControl {
+public class MailUtils {
 	@Resource(name="myMaileSender")
-	JavaMailSender mailSender;
+	static JavaMailSender mailSender;
 	@Value("${spring.mail.username}")
-	String sender;
+	static String sender;
 	@Autowired
-	TemplateEngine templateEngine;
+	static TemplateEngine templateEngine;
 
+	@RequestMapping("send")
+	public static void sendSimpleEmail() throws MessagingException {
+		String receivers = "865503413@qq.com";
+	    // 构造Email消息
+	    MimeMessage message = mailSender.createMimeMessage();
+	    message.setHeader("Disposition-Notification-To",receivers); // 设置回执
+	    MimeMessageHelper helper = new MimeMessageHelper(message);
+	    try {
+			helper.setFrom("1244935783@qq.com");
+			helper.setTo(receivers);
+		    helper.setSubject("SimpleTest");
+		    helper.setText("邮件内容:this is a simpleMail test!并抄送给程");
+		    helper.setCc("1139039950@qq.com");
+		  
+		    System.out.println("发送成功！");
+		} catch (MessagingException e) {
+			System.out.println("发送失败！");
+			e.printStackTrace();
+		}
+	    
+	    
+	    mailSender.send(message);
+	}
 	/**
 	 * 发送模板邮件
 	 * @param receivers
@@ -50,13 +67,12 @@ public class RichMailControl {
 	@RequestMapping(value="/template")
 //	public String sendTemplateMail(@RequestBody ArrayList<ReceiverPo> receiverPos,@RequestBody ArrayList<ReceiverPo> carboncopyPos,
 //			String subject,String content) throws MessagingException {	
-	public void sendTemplateMail(@RequestBody String jsonStr) throws MessagingException {
+	public static void sendTemplateMail(String jsonStr) throws MessagingException {
 		JSONObject jsonObject = JSONObject.parseObject(jsonStr);
 		List<ReceiverPo> receiverPos = JSON.parseArray(JSON.parseObject(jsonStr).getString("receiverPos"), ReceiverPo.class);
 		List<ReceiverPo> carboncopyPos = JSON.parseArray(JSON.parseObject(jsonStr).getString("carboncopyPos"), ReceiverPo.class);
 		String subject = jsonObject.getString("subject");
 		String content = jsonObject.getString("content");
-		System.out.println("#########"+subject+"&&&"+content);
 		//数据有效性验证
 		String[] receiver = getValidEmailAddress((ArrayList<ReceiverPo>)receiverPos); // 收件人
 		String[] ccs = getValidEmailAddress((ArrayList<ReceiverPo>)carboncopyPos); // 抄送人
@@ -67,7 +83,7 @@ public class RichMailControl {
 		try {
 			helper.setFrom(sender); // 发件人
 			helper.setSubject(subject);
-			//helper.setCc(ccs);
+			helper.setCc(ccs);
 			//注意：Context 类是在org.thymeleaf.context.Context包下的。
 		    Context context = new Context();
 			for (int i = 0; i < receiver.length; i++) {
@@ -90,8 +106,7 @@ public class RichMailControl {
 
 	}
 	
-	@RequestMapping(value="/attachment")	
-	public void sendAttachmentMail(@RequestBody String jsonStr) throws MessagingException {
+	public static void sendAttachmentMail(String jsonStr) throws MessagingException {
 		JSONObject jsonObject = JSONObject.parseObject(jsonStr);
 		List<ReceiverPo> receiverPos = JSON.parseArray(JSON.parseObject(jsonStr).getString("receiverPos"), ReceiverPo.class);
 		List<ReceiverPo> carboncopyPos = JSON.parseArray(JSON.parseObject(jsonStr).getString("carboncopyPos"), ReceiverPo.class);
@@ -129,7 +144,6 @@ public class RichMailControl {
 			System.out.println("发送失败！");
 			e.printStackTrace();
 		}
-
 	}
 	/**
 	   *   筛选合法邮箱地址

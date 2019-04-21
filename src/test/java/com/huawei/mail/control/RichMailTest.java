@@ -63,4 +63,35 @@ public class RichMailTest {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	public void test2() {
+		ReceiverPo po1 = new ReceiverPo();
+		po1.setMail("865503413@qq.com");
+		ReceiverPo po2 = new ReceiverPo();
+		po2.setMail("1139039950@qq.com");
+		ArrayList<ReceiverPo> list = new ArrayList<ReceiverPo>();
+		list.add(po1);
+		list.add(po2);
+		
+		JSONObject json = new JSONObject();
+		
+		try {
+			json.put("receiverPos", list);
+			json.put("carboncopyPos", list);
+			json.put("subject", "liyong的附件邮件测试");
+			json.put("content", "这是一封测试邮件！");
+			
+			String str = JSONObject.toJSONString(list);
+			
+//			mockMvc.perform(MockMvcRequestBuilders.patch("/richMail/template").param("receiverPos", str).param("carboncopyPos", str).
+//					param("subject", "liyong的模板邮件测试").param("content", "这是一封测试邮件！"));
+			mockMvc.perform(MockMvcRequestBuilders.post("/richMail/attachment").content(json.toString()).contentType("application/json;charset=UTF-8")).andReturn();
+			//mockMvc.perform(MockMvcRequestBuilders.post("/richMail/template", list,list,"liyong的模板邮件测试","这是一封测试邮件！"));
+			System.out.println("测试成功！");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
