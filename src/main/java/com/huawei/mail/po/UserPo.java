@@ -10,7 +10,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class ReceiverPo {
+public class UserPo {
 	private String name;
 	private String mail;
 	@Override

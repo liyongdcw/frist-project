@@ -19,7 +19,7 @@ public class EmailConfig {
     private String username;
     private String password;
 
-    @Bean(name="myMaileSender")
+    
     public MailSender javaMailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setHost(host);
